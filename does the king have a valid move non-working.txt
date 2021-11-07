@@ -1,0 +1,69 @@
+            // find the king
+            string player = WhatPlayer(player1King);
+            Cell kingPosition = FindKing(player);
+
+            //Mark the grid with the kings legal moves
+            myBoard.MarkNextLegalMoves(kingPosition, "King", player1King);
+
+            //create a list to store the kings legal moves
+            List<IntPoint> KingLegalMoves = new List<IntPoint>();
+            
+            int row = 0;
+            int col = 0;
+
+
+            // find all legal moves on the grid write location to list of legal moves to work through.
+            for (row = 0; row < myBoard.Size; row++)
+            {
+                for (col = 0; col < myBoard.Size; col++)
+                {
+                    if (myBoard.TheGrid[row, col].LegalNextMove || myBoard.TheGrid[row,col].Attack)
+                    {
+                        IntPoint kingMove = new IntPoint(row,col);
+                        kingMove.row = row;
+                        kingMove.col = col;
+                        KingLegalMoves.Add(kingMove);
+                    }
+                }
+            }
+
+            myBoard.ClearNextMoves();
+
+            //change to opposite palyer
+            player = WhatPlayer(!player1King);
+
+            //for each possible legal move for the king ...
+            for (int i = 0; i < KingLegalMoves.Count; i++)
+            {
+                // go through all the cells on the board ...
+                for (row = 0; row < myBoard.Size; row++)
+                {
+                    for (col = 0; col < myBoard.Size; col++)
+                    {
+                        // does this cell contain the opposite players peice 
+                        if (player == myBoard.TheGrid[row, col].Occupied.ToString())
+                        {
+                            // mark the legal moves for this peice
+                            Cell currentCell = myBoard.TheGrid[row, col];
+                            string peiceSelected = currentCell.Peice;
+                            myBoard.MarkNextLegalMoves(currentCell, peiceSelected, !player1King);
+
+                            // if the other players peice tested marks the king's proposed move cell
+                            // gotten from the list a legal move then the king can not move to this space
+                            // and we should continue through the list until we find a space that is not marked as a legal move
+                            //by the test peice... therefore a legal move for the king
+                            if (myBoard.TheGrid[KingLegalMoves[i].row, KingLegalMoves[i].col].LegalNextMove)
+                            {
+                                // found a legal move for the king break
+                                myBoard.ClearHasKingInCheck();
+                                myBoard.ClearNextMoves();
+                                // there is a possible legal move for the king so it is not checkmate
+                                return;
+                            }
+                            myBoard.ClearNextMoves();
+                        }
+                    }
+                }
+            }
+
+           

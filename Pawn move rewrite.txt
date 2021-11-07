@@ -1,0 +1,90 @@
+        /// <summary>
+        /// Evaluate pawn next legal moves
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        private bool PawnMarkLegal(int row, int col, bool continueEval)
+        {
+            // if occupide occupied mark as not a valid move
+            if (TheGrid[row, col].Occupied != CellOccupiedBy.Unoccupied)
+            {
+                TheGrid[row, col].LegalNextMove = false;
+                return !continueEval;
+            }
+            //if space is empty mark as legal move
+            else
+            {
+                TheGrid[row, col].LegalNextMove = true;
+                return continueEval;
+            }
+        }
+
+                if (player1Turn && CurrentLocation.Occupied == CellOccupiedBy.PlayerOne)
+                {
+                    int rowMoveTo = CurrentLocation.RowNumber - 1;
+                    int colMoveTo = CurrentLocation.ColumnNumber;
+                    //if false stop evaluating legal another peice is in the way
+                    bool continueEval = true;
+
+                    // legal moves
+                    if (rowMoveTo >= 0)
+                    {
+                        continueEval = PawnMarkLegal(rowMoveTo, colMoveTo, continueEval);
+                    }
+
+                    // if in game start row and nothing blockin ten pawn can move 2 spaces
+                    if (CurrentLocation.RowNumber == 6 && continueEval)
+                    {
+                        rowMoveTo = CurrentLocation.RowNumber - 2;
+                        if (rowMoveTo >= 0)
+                        {
+                            PawnMarkLegal(rowMoveTo, colMoveTo, continueEval);
+                        }
+                    }
+
+                    // Check the attack moves
+                    rowMoveTo = CurrentLocation.RowNumber - 1;
+                    for (colMoveTo = CurrentLocation.ColumnNumber - 1; colMoveTo <= CurrentLocation.ColumnNumber + 1; colMoveTo += 2)
+
+                        // legal attacks
+                        if (rowMoveTo >= 0 && colMoveTo >= 0 && colMoveTo < Size)
+                        {
+                            PawnMarkAttack(rowMoveTo, colMoveTo, player1Turn);
+                        }
+                }
+
+                // do the same if player 2 can only move down the board to row 7
+                else if (!player1Turn && CurrentLocation.Occupied != CellOccupiedBy.PlayerOne)
+                {
+                    int rowMoveTo = CurrentLocation.RowNumber + 1;
+                    int colMoveTo = CurrentLocation.ColumnNumber;
+                    // if false stop evaluating legal moves if another peice is in the way
+                    bool continueEval = true;
+
+                    // legal moves
+                    if (rowMoveTo < Size)
+                    {
+                        continueEval = PawnMarkLegal(rowMoveTo, colMoveTo, continueEval);
+                    }
+
+                    if (CurrentLocation.RowNumber == 1 && continueEval)
+                    {
+                        rowMoveTo = CurrentLocation.RowNumber + 2;
+                        if (rowMoveTo < Size)
+                        {
+                            PawnMarkLegal(rowMoveTo, colMoveTo, continueEval);
+                        }
+                    }
+
+                    // Check the attack moves
+                    rowMoveTo = CurrentLocation.RowNumber + 1;
+                    for (colMoveTo = CurrentLocation.ColumnNumber - 1; colMoveTo <= CurrentLocation.ColumnNumber + 1; colMoveTo += 2)
+
+                        // legal attacks
+                        if (rowMoveTo < Size && colMoveTo >= 0 && colMoveTo < Size)
+                        {
+                            PawnMarkAttack(rowMoveTo, colMoveTo, player1Turn);
+                        }
+                }
+                break;

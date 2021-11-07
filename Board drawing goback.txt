@@ -1,0 +1,98 @@
+/// <summary>
+        /// Draw the board, using the info from the board class
+        /// </summary>
+        private void RefreshBoard()
+        {
+            bool whiteBackground = false;
+            for (int row = 0; row < myBoard.Size; row++)
+            {
+                whiteBackground = !whiteBackground;
+                for (int col = 0; col < myBoard.Size; col++)
+                {
+
+                    btnGrid[row, col].Content = "";
+                    string cellPlayer = myBoard.TheGrid[row, col].Occupied.ToString();
+                    bool cellHasPeice = cellPlayer.Length != 0 && cellPlayer != "Unoccupied";
+                    string peice = myBoard.TheGrid[row, col].Peice;
+
+                    if (myBoard.TheGrid[row, col].LegalNextMove)
+                    {
+                        //btnGrid[row, col].Content = "Legal";
+                        btnGrid[row, col].Background = Brushes.LightGreen;
+                        whiteBackground = !whiteBackground;
+                    }
+
+                    // if space is occupied
+                    else if (cellHasPeice)
+                    {
+                        // format attacking cells
+                        if (myBoard.TheGrid[row, col].Attack)
+                        {
+                            btnGrid[row, col].Background = Brushes.Red;
+                            btnGrid[row, col].BorderBrush = Brushes.Red;
+                            btnGrid[row, col].BorderThickness = new Thickness(10);
+
+                            //get the path to the image from get button image method
+                            string imgSource = GetButtonImage(peice, cellPlayer);
+
+                            //place peice image in thoccupied square
+                            btnGrid[row, col].Content = new Image
+                            {
+                                //test string that hard codes the image to the wight knight: 
+                                //Source = new BitmapImage(new Uri("Images/WH_knight.png", UriKind.RelativeOrAbsolute))
+                                Source = new BitmapImage(new Uri(imgSource, UriKind.RelativeOrAbsolute)),
+                            };
+                            // toggle main background
+                            whiteBackground = !whiteBackground;
+                        }
+
+                        else if (myBoard.TheGrid[row, col].Selected)
+                        {
+                            btnGrid[row, col].Background = Brushes.Blue;
+                            btnGrid[row, col].BorderBrush = Brushes.Blue;
+                            btnGrid[row, col].BorderThickness = new Thickness(10);
+
+                            //get the path to the image from get button image method
+                            string imgSource = GetButtonImage(peice, cellPlayer);
+
+                            //place peice image in thoccupied square
+                            btnGrid[row, col].Content = new Image
+                            {
+                                //test string that hard codes the image to the wight knight: 
+                                //Source = new BitmapImage(new Uri("Images/WH_knight.png", UriKind.RelativeOrAbsolute))
+                                Source = new BitmapImage(new Uri(imgSource, UriKind.RelativeOrAbsolute)),
+                            };
+                            // toggle main background
+                            whiteBackground = !whiteBackground;
+                        }
+
+                        else
+                        {
+                            //get the path to the image from get button image method
+                            string imgSource = GetButtonImage(peice, cellPlayer);
+
+                            //place peice image in thoccupied square
+                            btnGrid[row, col].Content = new Image
+                            {
+                                //test string that hard codes the image to the wight knight: 
+                                //Source = new BitmapImage(new Uri("Images/WH_knight.png", UriKind.RelativeOrAbsolute))
+                                Source = new BitmapImage(new Uri(imgSource, UriKind.RelativeOrAbsolute)),
+                            };
+
+                            // background button formatting toggle method
+                            whiteBackground = BoardBackgroundToggle(whiteBackground, row, col);
+
+                            // text return of the peice uncomment for troubleshooting 
+                            //btnGrid[i, j].Content = peice;
+                        }
+                    }
+
+                    // if not occupied or next legal move
+                    else if (cellPlayer=="Unoccupied")
+                    {
+                        // background tolor toggle method
+                        whiteBackground = BoardBackgroundToggle(whiteBackground, row, col);
+                    }
+                }
+            }
+        }

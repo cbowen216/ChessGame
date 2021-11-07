@@ -1,0 +1,188 @@
+ // if there is not a legal move for the king then find the peice that put king in check is it a rook, bishop or Queen?
+            // can the path be blocked?
+
+            //find the peice that has the king in check
+
+            Cell checkPosition = myBoard.TheGrid[row, col];
+
+            for (row = 0; row < myBoard.Size; row++)
+            {
+                for (col = 0; col < myBoard.Size; col++)
+                {
+                    if (myBoard.TheGrid[row, col].HasKingInCheck)
+                    {
+                        checkPosition = myBoard.TheGrid[row, col];
+                    }
+                }
+            }
+
+            // end game
+            if (checkPosition.Peice == "Pawn"
+                || checkPosition.Peice == "Knight"
+                || checkPosition.Peice =="King")
+            {
+                // if the peice is a knight or Pawn a peice can not be moved between the king and that peice to block.
+                // since we already evalueate that the king has no legal moves left... checkmate
+                mate = true;
+            }
+
+            else
+            {
+                //mark the spaces between the king and the peice that has the king in check as legal moves
+                if ((checkPosition.Peice == "Rook"
+                || checkPosition.Peice == "Queen")
+                && (kingPosition.RowNumber == checkPosition.RowNumber
+                || kingPosition.ColumnNumber == checkPosition.ColumnNumber))
+                {
+                    //if king above peice that has king in check
+                    if (kingPosition.RowNumber > checkPosition.RowNumber)
+                    {
+                        for (row = kingPosition.RowNumber; row > checkPosition.RowNumber; row++)
+                        {
+                            col = kingPosition.ColumnNumber;
+                            myBoard.TheGrid[row, col].LegalNextMove = true;
+                        }
+                    }
+
+                    //if king below peice that has king in check
+                    if (kingPosition.RowNumber < checkPosition.RowNumber)
+                    {
+                        for (row = kingPosition.RowNumber; row < checkPosition.RowNumber; row--)
+                        {
+                            col = kingPosition.ColumnNumber;
+                            myBoard.TheGrid[row, col].LegalNextMove = true;
+                        }
+                    }
+
+                    //if king to the right of peice that has king in check
+                    if (kingPosition.ColumnNumber > checkPosition.ColumnNumber)
+                    {
+                        for (col = kingPosition.ColumnNumber; col > checkPosition.RowNumber; col--)
+                        {
+                            row = kingPosition.RowNumber;
+                            myBoard.TheGrid[row, col].LegalNextMove = true;
+                        }
+                    }
+
+                    //if king to the left of peice that has king in check
+                    if (kingPosition.ColumnNumber < checkPosition.ColumnNumber)
+                    {
+                        for (col = kingPosition.ColumnNumber; col < checkPosition.RowNumber; col++)
+                        {
+                            row = kingPosition.RowNumber;
+                            myBoard.TheGrid[row, col].LegalNextMove = true;
+                        }
+                    }
+
+                }
+
+                else if ((checkPosition.Peice == "Bishop"
+                        || checkPosition.Peice == "Queen")
+                        && kingPosition.RowNumber != checkPosition.RowNumber
+                        && kingPosition.ColumnNumber != checkPosition.ColumnNumber)
+                {
+                    //if king above and right of peice that has king in check
+                    if (kingPosition.RowNumber > checkPosition.RowNumber
+                        && kingPosition.ColumnNumber > checkPosition.ColumnNumber)
+                    {
+                        for (row = kingPosition.RowNumber; row > checkPosition.RowNumber; row++)
+                        {
+                            col--;
+                            myBoard.TheGrid[row, col].LegalNextMove = true;
+                        }
+                    }
+
+                    //if king above and left of peice that has king in check
+                    if (kingPosition.RowNumber > checkPosition.RowNumber
+                        && kingPosition.ColumnNumber < checkPosition.ColumnNumber)
+                    {
+                        for (row = kingPosition.RowNumber; row > checkPosition.RowNumber; row++)
+                        {
+                            col++;
+                            myBoard.TheGrid[row, col].LegalNextMove = true;
+                        }
+                    }
+
+                    //if king below and right of peice that has king in check
+                    if (kingPosition.RowNumber < checkPosition.RowNumber
+                        && kingPosition.ColumnNumber > checkPosition.ColumnNumber)
+                    {
+                        for (row = kingPosition.RowNumber; row > checkPosition.RowNumber; row--)
+                        {
+                            col--;
+                            myBoard.TheGrid[row, col].LegalNextMove = true;
+                        }
+                    }
+
+                    //if king below and left of peice that has king in check
+                    if (kingPosition.RowNumber < checkPosition.RowNumber
+                        && kingPosition.ColumnNumber < checkPosition.ColumnNumber)
+                    {
+                        for (row = kingPosition.RowNumber; row > checkPosition.RowNumber; row--)
+                        {
+                            col++;
+                            myBoard.TheGrid[row, col].LegalNextMove = true;
+                        }
+                    }
+
+                }
+
+                //create a list to store the the checkpeice legal moves
+                List<IntPoint> LegalMoves = new List<IntPoint>();
+
+                // find all legal moves on the grid write location to list of legal moves to work through.
+                for (row = 0; row < myBoard.Size; row++)
+                {
+                    for (col = 0; col < myBoard.Size; col++)
+                    {
+                        if (myBoard.TheGrid[row, col].LegalNextMove || myBoard.TheGrid[row, col].Attack)
+                        {
+                            IntPoint PossibleMove = new IntPoint(row, col);
+                            PossibleMove.row = row;
+                            PossibleMove.col = col;
+                            LegalMoves.Add(PossibleMove);
+                        }
+                    }
+                }
+
+                //change to opposite palyer
+                player = WhatPlayer(player1King);
+
+                //for each possible legal move for the peice in check ...
+                for (int i = 0; i < LegalMoves.Count; i++)
+                {
+                    // go through all the cells on the board ...
+                    for (row = 0; row < myBoard.Size; row++)
+                    {
+                        for (col = 0; col < myBoard.Size; col++)
+                        {
+                            // does this cell contain the opposite players peice 
+                            if (player == myBoard.TheGrid[row, col].Occupied.ToString())
+                            {
+                                // mark the legal moves for this peice
+                                Cell currentCell = myBoard.TheGrid[row, col];
+                                string peiceSelected = currentCell.Peice;
+                                myBoard.MarkNextLegalMoves(currentCell, peiceSelected, !player1King);
+
+                                // if the the legal moves for players peice tested = the check peice proposed move cell
+                                // gotten from the list of legal moves; then it can block the king from being in check.
+                                if (myBoard.TheGrid[LegalMoves[i].row, LegalMoves[i].col].LegalNextMove)
+                                {
+                                    // found a legal blocking move break
+                                    myBoard.ClearHasKingInCheck();
+                                    myBoard.ClearNextMoves();
+                                    // there is a possible legal move for the king so it is not checkmate
+                                    return;
+                                }
+                                myBoard.ClearNextMoves();
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            // if we have mad it here then the king does not have a legal move out of check
+            // and there is no possible blocking move... checkmate
+            mate = true;
+            return;
