@@ -52,7 +52,7 @@ namespace BoardModel2
                     // 'L' shaped move of 2 spaces in any direction and then 1 space 90 degrees from the original move
                     // There are 2 possible moves in each quadrent
 
-                    // step through all 4 quadrents using for next
+                    // step through all 4 quadrents using for loop
                     for (int move2Spaces = -2; move2Spaces <= 2; move2Spaces += 4)
                     {
                         for (int move1Space = -1; move1Space <= 1; move1Space += 2)
@@ -171,26 +171,6 @@ namespace BoardModel2
             }
         }
 
-        /// <summary>
-        /// is the move in the boundries of the board
-        /// </summary>
-        /// <param name="rowMoveTo"></param>
-        /// <param name="colMoveTo"></param>
-        /// <param name="player1Turn"></param>
-        private void InBoundsValidation(int rowMoveTo, int colMoveTo, bool player1Turn)
-        {
-            // validate row in bounds
-            if (rowMoveTo < Size && rowMoveTo >= 0)
-            {
-                // validate column in bounds
-                if (colMoveTo < Size && colMoveTo >= 0)
-                {
-                    // marks cell if inbounds
-                    MarkLegalOrAttack(rowMoveTo, colMoveTo, player1Turn, false);
-                }
-            }
-        }
-
         #region Clear board methods
         /// <summary>
         /// remove all peices from the board
@@ -247,6 +227,26 @@ namespace BoardModel2
         #region Private Methods
 
         /// <summary>
+        /// is the move in the boundries of the board
+        /// </summary>
+        /// <param name="rowMoveTo"></param>
+        /// <param name="colMoveTo"></param>
+        /// <param name="player1Turn"></param>
+        private void InBoundsValidation(int rowMoveTo, int colMoveTo, bool player1Turn)
+        {
+            // validate row in bounds
+            if (rowMoveTo < Size && rowMoveTo >= 0)
+            {
+                // validate column in bounds
+                if (colMoveTo < Size && colMoveTo >= 0)
+                {
+                    // marks cell if inbounds
+                    MarkLegalOrAttack(rowMoveTo, colMoveTo, player1Turn, false);
+                }
+            }
+        }
+
+        /// <summary>
         /// Evaluate pawn attack moves
         /// </summary>
         /// <param name="row"></param>
@@ -275,7 +275,7 @@ namespace BoardModel2
         /// <param name="player1Turn"></param>
         private bool MarkLegalOrAttack(int row, int col, bool player1Turn, bool isPawn)
         {
-            // flip to false if we run in to another peice and want to stop
+            // flip to false if we run in to another peice and want to stop the evaluation
             // continueeval used in the Queen, rook and bishop runs
             bool continueEval = true;
 
@@ -285,6 +285,7 @@ namespace BoardModel2
                 TheGrid[row, col].LegalNextMove = true;
                 return continueEval;
             }
+
             // if occupide by current player mark as not a valid move
             else if ((TheGrid[row, col].Occupied == CellOccupiedBy.PlayerOne && player1Turn)
                 || (TheGrid[row, col].Occupied == CellOccupiedBy.PlayerTwo && !player1Turn))
@@ -292,18 +293,21 @@ namespace BoardModel2
                 TheGrid[row, col].LegalNextMove = false;
                 return !continueEval;
             }
+
             //If cell is unoccupied and a pawn in moving
             else if ((TheGrid[row, col].Occupied == CellOccupiedBy.Unoccupied) && isPawn)
             {
                 TheGrid[row, col].LegalNextMove = true;
                 return continueEval;
             }
+
             //If cell is occupied and a pawn in moving
             else if ((TheGrid[row, col].Occupied != CellOccupiedBy.Unoccupied) && isPawn)
             {
                 TheGrid[row, col].LegalNextMove = false;
                 return !continueEval;
             }
+
             //if occupied by other player
             else
             {
@@ -322,39 +326,39 @@ namespace BoardModel2
             // up
             int row = CurrentLocation.RowNumber;
             int col = CurrentLocation.ColumnNumber;
-            bool continueWhile = true;
-            while (row > 0 && continueWhile)
+            bool continueEval = true;
+            while (row > 0 && continueEval)
             {
                 row--;
-                continueWhile = MarkLegalOrAttack(row, col, player1Turn,false);
+                continueEval = MarkLegalOrAttack(row, col, player1Turn,false);
             }
 
             // down
             row = CurrentLocation.RowNumber;
-            continueWhile = true;
-            while (row < Size - 1 && continueWhile)
+            continueEval = true;
+            while (row < Size - 1 && continueEval)
             {
                 row++;
-                continueWhile = MarkLegalOrAttack(row, col, player1Turn, false);
+                continueEval = MarkLegalOrAttack(row, col, player1Turn, false);
             }
 
             // Left
             row = CurrentLocation.RowNumber;
             col = CurrentLocation.ColumnNumber;
-            continueWhile = true;
-            while (col > 0 && continueWhile)
+            continueEval = true;
+            while (col > 0 && continueEval)
             {
                 col--;
-                continueWhile = MarkLegalOrAttack(row, col, player1Turn, false);
+                continueEval = MarkLegalOrAttack(row, col, player1Turn, false);
             }
 
             // right
             col = CurrentLocation.ColumnNumber;
-            continueWhile = true;
-            while (col < Size - 1 && continueWhile)
+            continueEval = true;
+            while (col < Size - 1 && continueEval)
             {
                 col++;
-                continueWhile = MarkLegalOrAttack(row, col, player1Turn, false);
+                continueEval = MarkLegalOrAttack(row, col, player1Turn, false);
             }
         }
 
@@ -368,45 +372,45 @@ namespace BoardModel2
             // up and left
             int row = CurrentLocation.RowNumber;
             int col = CurrentLocation.ColumnNumber;
-            bool continueWhile = true;
-            while ((row > 0 && col > 0) && continueWhile)
+            bool continueEval = true;
+            while ((row > 0 && col > 0) && continueEval)
             {
                 row--;
                 col--;
-                continueWhile = MarkLegalOrAttack(row, col, player1Turn, false);
+                continueEval = MarkLegalOrAttack(row, col, player1Turn, false);
             }
 
             // up and right
             row = CurrentLocation.RowNumber;
             col = CurrentLocation.ColumnNumber;
-            continueWhile = true;
-            while ((row > 0 && col < Size - 1) && continueWhile)
+            continueEval = true;
+            while ((row > 0 && col < Size - 1) && continueEval)
             {
                 row--;
                 col++;
-                continueWhile = MarkLegalOrAttack(row, col, player1Turn, false);
+                continueEval = MarkLegalOrAttack(row, col, player1Turn, false);
             }
 
             // Down and left
             row = CurrentLocation.RowNumber;
             col = CurrentLocation.ColumnNumber;
-            continueWhile = true;
-            while ((row < Size - 1 && col > 0) && continueWhile)
+            continueEval = true;
+            while ((row < Size - 1 && col > 0) && continueEval)
             {
                 row++;
                 col--;
-                continueWhile = MarkLegalOrAttack(row, col, player1Turn, false);
+                continueEval = MarkLegalOrAttack(row, col, player1Turn, false);
             }
 
             // Down and Right
             row = CurrentLocation.RowNumber;
             col = CurrentLocation.ColumnNumber;
-            continueWhile = true;
-            while ((row < Size - 1 && col < Size - 1) && continueWhile)
+            continueEval = true;
+            while ((row < Size - 1 && col < Size - 1) && continueEval)
             {
                 row++;
                 col++;
-                continueWhile = MarkLegalOrAttack(row, col, player1Turn, false);
+                continueEval = MarkLegalOrAttack(row, col, player1Turn, false);
             }
         }
 
